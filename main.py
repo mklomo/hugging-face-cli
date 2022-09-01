@@ -2,10 +2,34 @@ import click
 from transformers import pipeline
 import urllib.request
 from bs4 import BeautifulSoup
+import wikipedia
+
+
 
 # mute tensorflow complaints
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = "3"
+
+
+# A function that returns a page from wikipedia
+def get_page(text):
+    try:
+        page_object = wikipedia.page(text)
+        
+    except wikipedia.page.exceptions.PageError:
+        return 'Page Not Found'
+    
+    except wikipedia.exceptions.DisambiguationError:
+        return 'Ambiguous Search'
+    
+    # Catch all
+    except Exception as e:
+        return 'Wrong Search'
+    
+    else:
+        return page_object.content
+
+
 
 def extract_from_url(url):
     text = ""
@@ -35,13 +59,16 @@ def process(text):
 @click.command()
 @click.option('--url')
 @click.option('--file')
-def main(url, file):
+@click.option('--wikipage')
+def main(url, file, wikipage):
     if url:
         text = extract_from_url(url)
     elif file:
         with open(file, 'r') as _f:
             text = _f.read()
-    click.echo(f"Summarized text from -> {url or file}")
+    elif wikipage:
+        text = get_page(wikipage)
+    click.echo(f"Summarized text from -> {url or file or wikipage}")
     click.echo(process(text))
 
 
