@@ -4,10 +4,6 @@ import gradio as gr
 
 
 
-# mute tensorflow complaints
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = "3"
-
 
 # A function that returns a page from wikipedia
 def get_page(text):
